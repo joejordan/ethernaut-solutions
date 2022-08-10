@@ -2,15 +2,15 @@
 pragma solidity >=0.8.4;
 
 import { Script } from "forge-std/Script.sol";
-import { Foo } from "../src/Foo.sol";
+import { CoinFlip } from "../src/CoinFlip.sol";
 
 /// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
-contract FooScript is Script {
-    Foo internal foo;
+contract CoinFlipScript is Script {
+    CoinFlip internal coinFlip;
 
     function run() public {
         vm.startBroadcast();
-        foo = new Foo();
+        coinFlip = new CoinFlip();
         vm.stopBroadcast();
     }
 }
