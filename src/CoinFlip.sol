@@ -2,5 +2,13 @@
 pragma solidity >=0.8.4;
 
 contract CoinFlip {
-    // solhint-disable-previous-line no-empty-blocks
+    uint256 val;
+
+    constructor() {
+        val = 69;
+    }
+
+    function getVal() public view returns (uint256) {
+        return val;
+    }
 }
