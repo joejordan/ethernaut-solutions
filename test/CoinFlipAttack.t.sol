@@ -24,6 +24,8 @@ contract CoinFlipAttackTest is PRBTest, Cheats {
     function testCoinFlip() public {
         // vm.selectFork(rinkeby);
         uint blockNumber = block.number;
+        // roll one block because the test reverts if we look for the 0th block in the coinFlip function
+        vm.roll(blockNumber++);
         bool success;
         address coinFlipTargetAddress = address(coinFlipTarget);
 
