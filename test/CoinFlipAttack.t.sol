@@ -12,23 +12,27 @@ contract CoinFlipAttackTest is PRBTest, Cheats {
     uint256 public local;
     CoinFlip public coinFlipTarget;
     CoinFlipAttack public coinFlipAttacker;
+
     function setUp() public {
         coinFlipTarget = new CoinFlip();
         coinFlipAttacker = new CoinFlipAttack();
         rinkeby = vm.createFork(vm.envString("ETH_RINKEBY_RPC_URL"));
-        local = vm.createFork(vm.envString("ETH_LOCAL_RPC_URL"));
+        // local = vm.createFork(vm.envString("ETH_LOCAL_RPC_URL"));
         
     }
 
     function testCoinFlip() public {
-        vm.selectFork(rinkeby);
-        // bool success = coinFlipAttacker.callCoinFlip();
-        // console.log(success);
+        // vm.selectFork(rinkeby);
         uint blockNumber = block.number;
-        console.logString("BLOCK NUMBER:::");
-        console.log(block.number);
-        vm.roll(++blockNumber);
-        console.logString("BLOCK NUMBER:::");
-        console.log(block.number);
+        bool success;
+        address coinFlipTargetAddress = address(coinFlipTarget);
+
+        for (uint256 i = 0; i < 11; i++) {
+            success = coinFlipAttacker.callCoinFlip(coinFlipTargetAddress);
+            assert(coinFlipTarget.consecutiveWins() == i + 1);
+            vm.roll(blockNumber++);
+        }
+
+        assert(coinFlipTarget.consecutiveWins() >= 10);
     }
 }
