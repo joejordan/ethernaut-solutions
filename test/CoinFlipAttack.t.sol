@@ -18,7 +18,6 @@ contract CoinFlipAttackTest is PRBTest, Cheats {
         coinFlipAttacker = new CoinFlipAttack();
         rinkeby = vm.createFork(vm.envString("ETH_RINKEBY_RPC_URL"));
         // local = vm.createFork(vm.envString("ETH_LOCAL_RPC_URL"));
-        
     }
 
     function testCoinFlip() public {
@@ -29,8 +28,10 @@ contract CoinFlipAttackTest is PRBTest, Cheats {
         bool success;
         address coinFlipTargetAddress = address(coinFlipTarget);
 
+        // loop through 10 blocks to meet the challenge requirement of 10 straight wins
         for (uint256 i = 0; i < 11; i++) {
             success = coinFlipAttacker.callCoinFlip(coinFlipTargetAddress);
+            assert(success);
             assert(coinFlipTarget.consecutiveWins() == i + 1);
             vm.roll(blockNumber++);
         }
