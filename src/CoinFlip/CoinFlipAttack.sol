@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.4;
 
-import { console } from "forge-std/console.sol";
+// import { console } from "forge-std/console.sol";
 
 import { ICoinFlip } from "src/CoinFlip/ICoinFlip.sol";
 
@@ -21,7 +21,6 @@ contract CoinFlipAttack {
         // get function selector
         bytes4 flipSelector = ICoinFlip.flip.selector;
         // call coinFlip function on target contract
-        console.logBytes(abi.encodePacked(flipSelector, side));
         (bool success, ) = coinFlipInstance.call(abi.encodeWithSelector(flipSelector, side));
 
         return success;
