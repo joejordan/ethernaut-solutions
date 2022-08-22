@@ -55,7 +55,7 @@ contract Ethernaut is Ownable {
     function submitLevelInstance(address payable _instance) public returns (bool) {
         // Get player and level.
         EmittedInstanceData storage data = emittedInstances[_instance];
-        console.log(data.player);
+
         require(data.player == msg.sender, "PLAYER IS NOT SENDER"); // instance was emitted for this player
         require(data.completed == false, "INSTANCE WAS ALREADY SUBMITTED"); // not already submitted
 
