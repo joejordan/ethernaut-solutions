@@ -7,6 +7,8 @@ pragma solidity ^0.8.15;
 import { Ownable } from "@openzeppelin/access/Ownable.sol";
 import { Level } from "./Level.sol";
 
+import { console } from "forge-std/console.sol";
+
 contract Ethernaut is Ownable {
     // ----------------------------------
     // Owner interaction
@@ -34,7 +36,7 @@ contract Ethernaut is Ownable {
     event LevelInstanceCreatedLog(address indexed player, address instance);
     event LevelCompletedLog(address indexed player, Level level);
 
-    function createLevelInstance(Level _level) public payable {
+    function createLevelInstance(Level _level) public payable returns (address) {
         // Ensure level is registered.
         require(registeredLevels[address(_level)]);
 
@@ -46,11 +48,14 @@ contract Ethernaut is Ownable {
 
         // Retrieve created instance via logs.
         emit LevelInstanceCreatedLog(msg.sender, instance);
+
+        return instance;
     }
 
-    function submitLevelInstance(address payable _instance) public {
+    function submitLevelInstance(address payable _instance) public returns (bool) {
         // Get player and level.
         EmittedInstanceData storage data = emittedInstances[_instance];
+        console.log(data.player);
         require(data.player == msg.sender, "PLAYER IS NOT SENDER"); // instance was emitted for this player
         require(data.completed == false, "INSTANCE WAS ALREADY SUBMITTED"); // not already submitted
 
@@ -61,6 +66,10 @@ contract Ethernaut is Ownable {
 
             // Notify success via logs.
             emit LevelCompletedLog(msg.sender, data.level);
+
+            return true;
         }
+
+        return false;
     }
 }
