@@ -8,6 +8,7 @@ contract ReentranceAttack {
     address private targetAddress;
     uint private initialDeposit;
     function attack(address _targetAddress) public payable {
+        require(msg.value >= 0.001 ether, "SEND MORE ETHER NEXT TIME CHEAPSKATE");
         // store target for use in recieve()
         targetAddress = _targetAddress;
         // store withdraw amount to reuse in receive
