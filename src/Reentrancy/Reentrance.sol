@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
+// https://github.com/OpenZeppelin/ethernaut/blob/master/contracts/contracts/levels/Reentrance.sol
 import "@openzeppelin/utils/math/SafeMath.sol";
 
 contract Reentrance {
@@ -25,7 +26,9 @@ contract Reentrance {
             if (result) {
                 _amount;
             }
-            balances[msg.sender] -= _amount;
+            // modified to use safeMath so that we don't underflow
+            balances[msg.sender].sub(_amount);
+
             emit Withdraw(msg.sender, _amount);
         }
     }
