@@ -3,8 +3,6 @@ pragma solidity ^0.8.15;
 
 import { Elevator, Building } from "./Elevator.sol";
 
-import { console } from "forge-std/console.sol";
-
 contract ElevatorAttack is Building {
     bool public lastFloorToggle;
 
