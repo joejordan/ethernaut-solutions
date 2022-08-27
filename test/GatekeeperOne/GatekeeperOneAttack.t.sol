@@ -10,6 +10,8 @@ import { GatekeeperOneFactory } from "src/GatekeeperOne/GatekeeperOneFactory.sol
 import { GatekeeperOne } from "src/GatekeeperOne/GatekeeperOne.sol";
 import { GatekeeperOneAttack } from "src/GatekeeperOne/GatekeeperOneAttack.sol";
 
+import { bytes32ToString } from "src/utils/toString.sol";
+
 contract GatekeeperOneAttackTest is PRBTest {
     Ethernaut public ethernaut;
     GatekeeperOneFactory public factory;
@@ -29,6 +31,13 @@ contract GatekeeperOneAttackTest is PRBTest {
     }
 
     function testGatekeeperOneAttack() public {
-        console.logString("stub");
+        attacker.attack(gatekeeperOneInstance);
+    }
+
+    
+    function testcontest() public {
+        bytes32 result = keccak256(abi.encodePacked(address(0x5243d93bCdC8941Aa4b925c712128ba4933007C0)));
+        console.logBytes32(result);
+        // console.logString(bytes32ToString(result));
     }
 }
