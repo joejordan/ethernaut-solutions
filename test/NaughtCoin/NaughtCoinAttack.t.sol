@@ -6,13 +6,11 @@ import { console } from "forge-std/console.sol";
 
 import { Ethernaut } from "src/Ethernaut.sol";
 import { NaughtCoin } from "src/NaughtCoin/NaughtCoin.sol";
-import { NaughtCoinAttack } from "src/NaughtCoin/NaughtCoinAttack.sol";
 import { NaughtCoinFactory } from "src/NaughtCoin/NaughtCoinFactory.sol";
 
 contract NaughtCoinAttackTest is PRBTest {
     Ethernaut public ethernaut;
     NaughtCoinFactory public factory;
-    NaughtCoinAttack public attacker;
     address public naughtCoinInstance;
     address public playerAddress = address(0x696969);
 
