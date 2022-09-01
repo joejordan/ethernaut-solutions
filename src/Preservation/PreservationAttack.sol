@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.15;
 
-import { Preservation } from "./Preservation.sol";
-
 contract PreservationAttack {
     address public dummy1; // timeZone1Library;
     address public dummy2; // timeZone2Library;
