@@ -28,7 +28,6 @@ contract ShopAttackTest is PRBTest {
         vm.stopPrank();
     }
 
-    // test with withrawPartner set directly
     function testShopAttack() public {
 
         attacker.attack(shopInstance);
