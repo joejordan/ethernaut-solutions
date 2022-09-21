@@ -8,7 +8,6 @@ import { Ethernaut } from "src/Ethernaut.sol";
 import { Dex } from "src/Dex/Dex.sol";
 import { SwappableToken } from "src/Dex/Dex.sol";
 import { DexFactory } from "src/Dex/DexFactory.sol";
-import { DexAttack } from "src/Dex/DexAttack.sol";
 
 contract DexAttackTest is PRBTest {
     Ethernaut public ethernaut;
@@ -18,8 +17,6 @@ contract DexAttackTest is PRBTest {
 
     address public token1;
     address public token2;
-
-    DexAttack attacker = new DexAttack();
 
     function setUp() public {
         vm.startPrank(playerAddress);
