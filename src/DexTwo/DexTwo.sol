@@ -5,6 +5,7 @@ import "@openzeppelin/token/ERC20/IERC20.sol";
 import "@openzeppelin/token/ERC20/ERC20.sol";
 import "@openzeppelin/utils/math/SafeMath.sol";
 import "@openzeppelin/access/Ownable.sol";
+import { console } from "forge-std/console.sol";
 
 contract DexTwo is Ownable {
     using SafeMath for uint256;
@@ -27,6 +28,8 @@ contract DexTwo is Ownable {
         address to,
         uint256 amount
     ) public {
+        console.log("SWAP msg.sender", msg.sender);
+        console.log("SWAP msg.sender BALANCE:", IERC20(from).balanceOf(msg.sender));
         require(IERC20(from).balanceOf(msg.sender) >= amount, "Not enough to swap");
         uint256 swapAmount = getSwapAmount(from, to, amount);
         IERC20(from).transferFrom(msg.sender, address(this), amount);
