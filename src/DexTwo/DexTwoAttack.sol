@@ -5,9 +5,8 @@ import "@openzeppelin/token/ERC20/IERC20.sol";
 import "@openzeppelin/token/ERC20/ERC20.sol";
 
 contract DexTwoAttack is ERC20 {
-    constructor(address _dexTwoAddress, address _playerAddress) ERC20("DexTwoAttack", "D2A") {
-        _mint(_dexTwoAddress, 100);
-        _mint(_playerAddress, 100);
+    constructor(address _playerAddress) ERC20("DexTwoAttack", "D2A") {
+        _mint(_playerAddress, 1000069);
     }
 
     function transferFrom(
