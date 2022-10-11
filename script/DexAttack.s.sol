@@ -7,7 +7,7 @@ import { console } from "forge-std/console.sol";
 import { Dex, SwappableToken } from "src/Dex/Dex.sol";
 
 contract DexAttackScript is Script {
-    address public dexInstance = address(0x65613E7d893ACeb98120Fd12153ce96fA35d51F2);
+    address public dexInstance = address(0xa6861eEdbC59AeC4144776BB999efEd7832ef0d2);
     address public token1;
     address public token2;
     function run() public {
