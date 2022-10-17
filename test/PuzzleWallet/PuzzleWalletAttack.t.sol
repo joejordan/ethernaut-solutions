@@ -11,27 +11,27 @@ import { PuzzleWalletFactory } from "src/PuzzleWallet/PuzzleWalletFactory.sol";
 contract PuzzleWalletAttackTest is PRBTest {
     Ethernaut public ethernaut;
     PuzzleWalletFactory public factory;
-    address payable public puzzleWalletInstance;
+    address public puzzleWalletInstance;
     // PuzzleWalletAttack public attacker;
     address public playerAddress = address(0x696969);
 
     function setUp() public {
-        vm.startPrank(playerAddress);
+        // vm.startPrank(playerAddress);
         vm.deal(playerAddress, 69 ether);
         ethernaut = new Ethernaut();
         factory = new PuzzleWalletFactory();
 
         ethernaut.registerLevel(factory);
-        puzzleWalletInstance = ethernaut.createLevelInstance(factory);
+        puzzleWalletInstance = ethernaut.createLevelInstance{value: 0.001 ether}(factory);
 
         // create attacker
         // attacker = new PuzzleWalletAttack(puzzleWalletInstance, playerAddress);
-        vm.stopPrank();
+        // vm.stopPrank();
     }
 
     function testPuzzleWalletAttack() public {
         vm.startPrank(playerAddress);
-        PuzzleProxy(puzzleWalletInstance).proposeNewAdmin(playerAddress);
+        PuzzleProxy(payable(puzzleWalletInstance)).proposeNewAdmin(payable(playerAddress));
 
     }
 }
