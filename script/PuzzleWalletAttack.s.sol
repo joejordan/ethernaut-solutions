@@ -3,7 +3,7 @@ pragma solidity ^0.8.16;
 import { Script } from "forge-std/script.sol";
 import { PuzzleWallet, PuzzleProxy } from "src/PuzzleWallet/PuzzleWallet.sol";
 
-contract PuzzleWalletAttack is Script {
+contract PuzzleWalletAttackScript is Script {
     address public puzzleWalletInstance = 0x02CFd9a4A158fd631981B6B5c63b4631a8C12Abe;
 
     bytes[] public depositData;
